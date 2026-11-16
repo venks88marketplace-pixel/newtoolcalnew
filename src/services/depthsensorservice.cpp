@@ -51,7 +51,14 @@ DepthSensorService::DepthSensorService(std::shared_ptr<INetworkService> network,
 
 void DepthSensorService::configure(const QJsonObject& settings)
 {
-    Q_UNUSED(settings);
+    m_outputDirectory = settings.value("outputDir")
+        .toString(QStringLiteral("C:/calibration/apps/depthSensorAnalysis"))
+        .trimmed();
+
+    if (m_outputDirectory.isEmpty()) {
+        m_outputDirectory =
+            QStringLiteral("C:/calibration/apps/depthSensorAnalysis");
+    }
 }
 
 void DepthSensorService::setBusy(bool b)
@@ -334,8 +341,19 @@ void DepthSensorService::startCalibrationRun()
 
     const QString fileName = QString("depth_sweep_%1.txt")
                                  .arg(QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss"));
-    const QString outPath = QDir::current().filePath(fileName);
+    QDir outputDirectory(m_outputDirectory);
+    if (!outputDirectory.mkpath(QStringLiteral("."))) {
+        setStatusText("Status: Fail");
+        setBusy(false);
+        emit runCompleted(
+            false,
+            QString("Failed to create output directory: %1")
+                .arg(m_outputDirectory));
+        setStatusText("");
+        return;
+    }
 
+    const QString outPath = outputDirectory.filePath(fileName);
     QFile outFile(outPath);
     if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         setStatusText("Status: Fail");

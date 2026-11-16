@@ -1355,9 +1355,7 @@ bool WfovContrastProcessor::shrinkwrapCrop(
     return !cropped.empty();
 }
 
-double WfovContrastProcessor::michelsonContrast(
-    const cv::Mat& roi) const
-{
+double WfovContrastProcessor::michelsonContrast(const cv::Mat& roi) const {
     if (roi.empty()) {
         return 0.0;
     }
@@ -1379,9 +1377,7 @@ double WfovContrastProcessor::michelsonContrast(
            denominator;
 }
 
-double WfovContrastProcessor::globalContrastPercentile(
-    const cv::Mat& roi) const
-{
+double WfovContrastProcessor::globalContrastPercentile(const cv::Mat& roi) const {
     if (roi.empty() ||
         roi.type() != CV_8UC1) {
         return 0.0;
@@ -1414,10 +1410,7 @@ double WfovContrastProcessor::globalContrastPercentile(
         1.0);
 }
 
-double WfovContrastProcessor::averageLinearMichelsonContrast(
-    const cv::Mat& roi,
-    bool horizontal) const
-{
+double WfovContrastProcessor::averageLinearMichelsonContrast(const cv::Mat& roi,bool horizontal) const {
     if (roi.empty()) {
         return 0.0;
     }
@@ -1459,9 +1452,7 @@ double WfovContrastProcessor::averageLinearMichelsonContrast(
                values.size() - 2);
 }
 
-cv::Mat WfovContrastProcessor::imageToGrayMat(
-    const QImage& image) const
-{
+cv::Mat WfovContrastProcessor::imageToGrayMat(const QImage& image) const {
     if (image.isNull()) {
         return {};
     }
@@ -1498,9 +1489,7 @@ cv::Mat WfovContrastProcessor::imageToGrayMat(
     return green.clone();
 }
 
-QImage WfovContrastProcessor::matToGrayImage(
-    const cv::Mat& mat) const
-{
+QImage WfovContrastProcessor::matToGrayImage(const cv::Mat& mat) const {
     if (mat.empty() ||
         mat.type() != CV_8UC1) {
         return {};
@@ -1516,8 +1505,7 @@ QImage WfovContrastProcessor::matToGrayImage(
     return image.copy();
 }
 
-void WfovContrastProcessor::clearResults()
-{
+void WfovContrastProcessor::clearResults() {
     m_leftGlobalContrastPercent = 0.0;
     m_rightGlobalContrastPercent = 0.0;
     m_globalContrastPercent = 0.0;
@@ -1532,9 +1520,7 @@ void WfovContrastProcessor::clearResults()
     emit resultsChanged();
 }
 
-void WfovContrastProcessor::setStatus(
-    const QString& status)
-{
+void WfovContrastProcessor::setStatus(const QString& status) {
     if (m_statusText == status) {
         return;
     }
@@ -1544,8 +1530,7 @@ void WfovContrastProcessor::setStatus(
     emit statusTextChanged();
 }
 
-void WfovContrastProcessor::setMeasuring(
-    bool value)
+void WfovContrastProcessor::setMeasuring(bool value)
 {
     if (m_measuring == value) {
         return;
@@ -1556,8 +1541,7 @@ void WfovContrastProcessor::setMeasuring(
     emit measuringChanged();
 }
 
-void WfovContrastProcessor::setMeasurementReady(
-    bool value)
+void WfovContrastProcessor::setMeasurementReady(bool value)
 {
     if (m_measurementReady == value) {
         return;
@@ -1580,28 +1564,33 @@ void WfovContrastProcessor::setSaved(
     emit savedChanged();
 }
 
+void WfovContrastProcessor::setOutputDirectory(const QString& directory)
+{
+    if (!directory.trimmed().isEmpty()) {
+        m_outputDirectory = directory;
+    }
+}
+
 bool WfovContrastProcessor::saveMeasurement() const
 {
     if (m_lastFrameResult.rawImage.isNull()) {
         return false;
     }
 
-    const QString desktopPath =
-        QStandardPaths::writableLocation(
-            QStandardPaths::DesktopLocation);
-
     const QString date =
-        QDate::currentDate().toString(
-            QStringLiteral("yyyy-MM-dd"));
+    QDate::currentDate().toString(QStringLiteral("yyyy-MM-dd"));
 
     const QString timestamp =
-        QDateTime::currentDateTime().toString(
-            QStringLiteral("HH_mm_ss"));
+        QDateTime::currentDateTime().toString(QStringLiteral("HH_mm_ss"));
+
+    QDir baseDirectory(m_outputDirectory);
+    if (!baseDirectory.mkpath(QStringLiteral("."))) {
+        return false;
+    }
 
     QDir folder(
-        desktopPath +
-        QStringLiteral("/WFOV Camera Data ") +
-        date);
+        baseDirectory.filePath(
+            QStringLiteral("WFOV Camera Data ") + date));
 
     if (!folder.mkpath(QStringLiteral("."))) {
         return false;

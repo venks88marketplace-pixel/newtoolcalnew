@@ -31,6 +31,7 @@ private:
     void setStatusText(const QString& s);
     void setOutputFilePath(const QString& p);
     double rawToMm(double raw) const;
+    QString m_outputDirectory {QStringLiteral("C:/calibration/apps/depthSensorAnalysis")};
 
 private:
     std::shared_ptr<INetworkService> m_network;

@@ -91,6 +91,8 @@ public:
     Q_INVOKABLE void confirmAndSave();
     Q_INVOKABLE void resetMeasurement();
 
+    void setOutputDirectory(const QString& directory);
+
 signals:
     void validFrameCountChanged();
     void measuringChanged();
@@ -210,4 +212,5 @@ private:
     std::deque<double> m_rightLinearHistory;
 
     FrameResult m_lastFrameResult;
+    QString m_outputDirectory {QStringLiteral("C:/calibration/apps/wfovContrastAnalysis")};
 };
