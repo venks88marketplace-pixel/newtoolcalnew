@@ -571,11 +571,36 @@ void UVAlignmentProcessor::precomputeLUT() {
 
 // Currently this is single threaded so the entire app hangs while its saving for 2~4 seconds.
 // Needs fixing or some GUI waiting status that can mask this problem.
-QString UVAlignmentProcessor::saveData() {
-    QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    QString folderName = QString("UVLA Uniformity Data %1").arg(QDate::currentDate().toString("yyyy-MM-dd"));
-    QString folderPath = desktopPath + "/" + folderName;
-    QDir().mkpath(folderPath);
+QString UVAlignmentProcessor::saveData()
+{
+    return saveDataForAssembly(QStringLiteral("launch"));
+}
+
+QString UVAlignmentProcessor::saveDataForAssembly(const QString& assembly)
+{
+    const bool isBlock =
+        assembly.compare(QStringLiteral("block"), Qt::CaseInsensitive) == 0;
+
+    const QString outputDirectory =
+        isBlock ? m_blockOutputDirectory : m_launchOutputDirectory;
+
+    const QString folderName =
+        QStringLiteral("UVLA Uniformity Data %1")
+            .arg(QDate::currentDate().toString("yyyy-MM-dd"));
+
+    QDir baseDirectory(outputDirectory);
+    if (!baseDirectory.mkpath(QStringLiteral("."))) {
+        qWarning() << "[UVAlignment] Could not create output directory:"
+                   << outputDirectory;
+        return {};
+    }
+
+    const QString folderPath = baseDirectory.filePath(folderName);
+    if (!QDir().mkpath(folderPath)) {
+        qWarning() << "[UVAlignment] Could not create output folder:"
+                   << folderPath;
+        return {};
+    }
 
     QString timestamp = QDateTime::currentDateTime().toString("HH_mm_ss");
 
@@ -673,4 +698,11 @@ void UVAlignmentProcessor::setApplyMeanFilter(bool val) {
         qInfo() << "[UVAlignment] Mean filter:" << (val ? "ON" : "OFF");
         emit togglesChanged();
     }
+}
+
+void UVAlignmentProcessor::configure(const QJsonObject& settings) {
+    m_launchOutputDirectory = settings.value("launch_analysis_folder")
+        .toString(QStringLiteral("C:/calibration/apps/uvLaunchAssemblyAnalysis"));
+    m_blockOutputDirectory = settings.value("block_analysis_folder")
+        .toString(QStringLiteral("C:/calibration/apps/uvBlockAssemblyAnalysis"));
 }

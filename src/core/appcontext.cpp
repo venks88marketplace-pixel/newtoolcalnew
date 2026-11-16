@@ -28,8 +28,8 @@
 
 AppContext::AppContext(
     ServiceRegistry& registry,
+    const QJsonObject& config,
     QObject* parent)
-    : QObject(parent)
 {
     m_auth =
         registry.mustGetAs<AuthService>(
@@ -118,6 +118,13 @@ AppContext::AppContext(
         std::make_shared<WfovContrastProcessor>(
             m_imageService,
             this);
+    
+    const QJsonObject outputDirectories =
+    config.value("output_directories").toObject();
+
+    m_wfovContrastProcessor->setOutputDirectory(
+        outputDirectories.value("wfov_contrast").toString(
+            QStringLiteral("C:/calibration/apps/wfovContrastAnalysis")));
 
     m_opticalCalibrationImportExportService =
         std::make_shared<OpticalCalibrationImportExportService>(

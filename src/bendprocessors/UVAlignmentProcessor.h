@@ -42,6 +42,8 @@ public:
     Q_INVOKABLE void toggleFalseColor() { setApplyFalseColor(!applyFalseColor()); }
     Q_INVOKABLE void toggleMeanFilter() { setApplyMeanFilter(!applyMeanFilter()); }
     Q_INVOKABLE QString saveData();
+    virtual void configure(const QJsonObject& settings) override;
+    Q_INVOKABLE QString saveDataForAssembly(const QString& assembly);
 
     // Getters
     double centroidX() const { return m_centroidX; }
@@ -161,4 +163,7 @@ private:
 
     QElapsedTimer m_throttle;
     QJsonObject m_lastData;
+
+    QString m_launchOutputDirectory{QStringLiteral("C:/calibration/apps/uvLaunchAssemblyAnalysis")};
+    QString m_blockOutputDirectory{QStringLiteral("C:/calibration/apps/uvBlockAssemblyAnalysis")};
 };

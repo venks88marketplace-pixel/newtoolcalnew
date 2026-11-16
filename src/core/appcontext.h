@@ -66,7 +66,7 @@ class AppContext : public QObject
     Q_PROPERTY(QObject* opticalCalibrationImportExportService READ opticalCalibrationImportExportService CONSTANT)
 
 public:
-    explicit AppContext(ServiceRegistry& registry, QObject* parent = nullptr);
+    explicit AppContext(ServiceRegistry& registry, const QJsonObject& config, QObject* parent = nullptr);
 
     QObject* authService() const;
     QObject* networkService() const;
