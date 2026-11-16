@@ -233,7 +233,7 @@ Page {
                 Layout.preferredWidth: 150
                 Layout.preferredHeight: 40
                 onClicked: {
-                    var folder = appContext.uvAlignmentProcessor.saveData();
+                    var folder = appContext.uvAlignmentProcessor.saveDataForAssembly("launch");
                     console.log("Data saved to: " + folder);
                 }
             }
